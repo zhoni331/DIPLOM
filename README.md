@@ -2,16 +2,43 @@
 
 A fullstack renovation platform with React frontend and Django backend, featuring evidence-based reputation for home renovation teams.
 
-## Project Structure
+## Tech Stack
 
-- `src/` - React TypeScript frontend
-- `api/` - Django REST backend
-- `dist/` - Built frontend (served by Django)
-- `supabase/` - Database migrations
+- **Frontend**: React, TypeScript, Vite, Tailwind CSS, shadcn/ui
+- **Backend**: Django, Django REST Framework, JWT Authentication
+- **Database**: SQLite (development), PostgreSQL (production)
 
 ## Quick Start
 
-### Unified Server (Production/Development)
+### Prerequisites
+
+- Python 3.8+
+- Node.js 16+
+- Git
+
+### Installation
+
+1. Clone the repository:
+```bash
+git clone <repository-url>
+cd DIPProjectMINE
+```
+
+2. Install Python dependencies:
+```bash
+cd api
+pip install -r requirements.txt
+```
+
+3. Install Node.js dependencies:
+```bash
+cd ..
+npm install
+```
+
+### Running the Server
+
+#### Unified Server (Recommended)
 
 Run the complete application with a single command:
 
@@ -19,23 +46,105 @@ Run the complete application with a single command:
 .\run.bat
 ```
 
-This builds the frontend and starts the Django server that serves both the frontend and provides API endpoints on port 8001.
+This builds the frontend and starts the Django server that serves both the frontend and API on port 8001.
 
-### Manual Start
+#### Manual Start
 
 ```bash
 # Build frontend
 npm run build
 
-# Collect static files
+# Apply database migrations
 cd api
-python manage.py collectstatic --noinput
+python manage.py migrate
 
 # Start Django server
 python manage.py runserver 0.0.0.0:8001
 ```
 
-### Development (with frontend hot reload)
+### Restarting the Server
+
+To restart the server:
+
+1. Stop the current server (Ctrl+C in terminal or kill the process)
+2. Run the start command again:
+```bash
+.\run.bat
+```
+
+Or manually:
+```bash
+cd api
+python manage.py runserver 0.0.0.0:8001
+```
+
+**If Ctrl+C doesn't work (Windows PowerShell issue):**
+```powershell
+Get-Process python | Where-Object { $_.Id -in (Get-NetTCPConnection | Where-Object LocalPort -eq 8001).OwningProcess } | Stop-Process -Force
+```
+
+## API Documentation
+
+When the server is running, visit:
+- **Frontend**: http://localhost:8001/
+- **API Health**: http://localhost:8001/api/health/
+- **Teams API**: http://localhost:8001/api/teams/
+- **Admin Panel**: http://localhost:8001/admin/
+
+## Available Endpoints
+
+**Authentication:**
+- `POST /api/auth/register/` - Register new user
+- `POST /api/auth/login/` - Login user
+- `GET /api/auth/me/` - Get current user
+
+**Teams:**
+- `GET /api/teams/` - List all teams
+- `POST /api/teams/` - Create team (contractor only)
+- `GET /api/teams/<id>/` - Get team details
+- `PUT /api/teams/<id>/` - Update team (owner only)
+
+**Reviews:**
+- `GET /api/reviews/` - List reviews
+- `POST /api/reviews/` - Submit review (homeowner only)
+- `GET /api/reviews/?team_id=<id>` - Get team reviews
+
+**Projects:**
+- `GET /api/projects/` - List projects (homeowner only)
+- `POST /api/projects/` - Create project (homeowner only)
+- `GET /api/projects/<id>/` - Get project details
+
+**Admin:**
+- `GET /api/admin/reviews/pending/` - Pending reviews
+- `POST /api/admin/reviews/<id>/approve/` - Approve review
+- `GET /api/admin/teams/pending/` - Pending teams
+- `POST /api/admin/teams/<id>/verify/` - Verify team
+
+## Features
+
+- Team browsing with trust scores
+- Evidence-based reviews and ratings
+- Contractor and homeowner dashboards
+- JWT authentication
+- Role-based access control
+- Admin moderation panel
+
+## Project Structure
+
+```
+├── src/                 # React frontend
+├── api/                 # Django backend
+│   ├── config/         # Django settings
+│   ├── apps/           # Django apps (auth, teams, reviews, projects)
+│   └── manage.py       # Django management script
+├── dist/               # Built frontend (served by Django)
+├── public/             # Static assets
+└── run.bat            # Unified startup script
+```
+
+## Development
+
+### Frontend Development (with hot reload)
 
 ```bash
 # Terminal 1: Start frontend dev server
@@ -46,112 +155,22 @@ cd api
 python manage.py runserver
 ```
 
-## API Documentation
+### Database Management
 
-When the server is running, visit:
-- API Endpoints: http://localhost:8001/api/
-- Health Check: http://localhost:8001/api/health/
-- Admin Panel: http://localhost:8001/admin/
-
-## Available Endpoints
-
-**Auth:**
-- `POST /api/auth/register/` - Register new user
-- `POST /api/auth/login/` - Login user
-- `GET /api/auth/me/` - Get current user
-
-**Teams:**
-- `GET /api/teams/` - List all teams
-- `POST /api/teams/` - Create team
-- `GET /api/teams/<id>/` - Get team details
-- `GET /api/teams/<id>/analytics/` - Team analytics
-- `GET /api/teams/trending/` - Get trending teams
-
-**Reviews:**
-- `GET /api/reviews/` - List reviews
-- `POST /api/reviews/` - Submit review
-- `GET /api/reviews/?team_id=<id>` - Get team reviews
-
-**Projects:**
-- `GET /api/projects/` - List projects
-- `POST /api/projects/` - Create project
-- `GET /api/projects/?team_id=<id>` - Get team projects
-
-## Features
-
-- Team browsing with trust scores
-- Evidence-based reviews
-- Contractor and homeowner dashboards
-- JWT authentication
-- Role-based access control
-
-## Tech Stack
-
-- **Frontend**: React, TypeScript, Vite, Tailwind CSS, shadcn/ui
-- **Backend**: FastAPI, Python, JWT, Pydantic
-- **Database**: Supabase PostgreSQL
-- **Deployment**: Single unified server
-- Edit files directly within the Codespace and commit and push your changes once you're done.
-
-## Setup & Configuration
-
-### Important: Required Configuration Files
-
-This project requires the following files to run properly:
-
-#### 1. `.env` file (Environment Variables)
-Create a `.env` file in the project root with your Supabase credentials:
-```
-VITE_SUPABASE_PROJECT_ID="your_project_id"
-VITE_SUPABASE_PUBLISHABLE_KEY="your_publishable_key"
-VITE_SUPABASE_URL="your_supabase_url"
+```bash
+cd api
+python manage.py makemigrations  # Create migrations
+python manage.py migrate         # Apply migrations
+python manage.py populate_teams  # Add sample data
 ```
 
-**Note**: The file should be named `.env` (with a dot), not `env`.
+## Testing
 
-#### 2. `postcss.config.js` file (Tailwind CSS Compilation)
-Create a `postcss.config.js` file in the project root:
-```javascript
-export default {
-  plugins: {
-    tailwindcss: {},
-    autoprefixer: {},
-  },
-}
+```bash
+# Run backend tests
+cd api
+python manage.py test
+
+# Run frontend tests
+npm test
 ```
-
-This file is required for Tailwind CSS to process `@tailwind` directives into compiled CSS.
-
-### Import Path Convention
-
-All Supabase client imports should use the correct path:
-```typescript
-import { supabase } from "@/integrations_supabase/client";
-```
-
-The folder is named `integrations_supabase` (with an underscore), not `integrations/supabase`.
-
-## What technologies are used for this project?
-
-This project is built with:
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-- Supabase (Backend as a Service)
-- TanStack React Query (Data fetching & caching)
-- React Router (Routing)
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)

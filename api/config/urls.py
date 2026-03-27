@@ -23,19 +23,19 @@ def serve_spa(request, path=''):
 
 api_patterns = [
     # Auth endpoints
-    path('auth/', include('apps.authentication.urls')),
+    path('auth', include('apps.authentication.urls')),
     
     # Teams endpoints
-    path('teams/', include('apps.teams.urls')),
+    path('teams', include('apps.teams.urls')),
     
     # Reviews endpoints
-    path('reviews/', include('apps.reviews.urls')),
+    path('reviews', include('apps.reviews.urls')),
     
     # Projects endpoints
-    path('projects/', include('apps.projects.urls')),
+    path('projects', include('apps.projects.urls')),
     
     # Health check
-    path('health/', health_check, name='health'),
+    path('health', health_check, name='health'),
 ]
 
 urlpatterns = [
